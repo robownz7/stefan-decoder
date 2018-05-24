@@ -12,34 +12,31 @@ public class motifCreator {
 
 	static FileWriter fileWriter;
     static PrintWriter printWriter;
+    static String outputString;
     
-	public static void motifWindow(String motifOutput) throws IOException {
+	public static String motifWindow(String input) throws IOException {
 		//initialize variables
 		int length;
-		
+	    String motifOutput = "motif output.txt";
 	    fileWriter = new FileWriter(motifOutput);
 	    printWriter = new PrintWriter(fileWriter);
-	    String input;
-	    long startTime, endTime;
-	    Component frame = null;
+	    outputString = "";
+	    //long startTime, endTime;
+	    //Component frame = null;
 	    
-	    do {
-		//Get input code
-		input = JOptionPane.showInputDialog("Enter an IUPAC Nucleotide Code string:");
-		if(input == null) {
-			return;
-		}
 		//store input length
 		length = input.length();
 		
 		//Convert all characters to upper-case
 		input = input.toUpperCase();	
-		
-		//Check validity of all code characters entered. If there is an invalid character, prompt for input again.
-	    }while(!checkCharacterValidity(input));
 	    
+		//Check character validity
+		if(!checkCharacterValidity(input)) {
+			return "";
+		}
+		
 	    //Start process timer
-		startTime = System.currentTimeMillis();
+		//startTime = System.currentTimeMillis();
 	    
 		//Build Arrays
 		char[] srcCodeArray = new char[length];
@@ -63,14 +60,16 @@ public class motifCreator {
 		
 		//Recurse though the array printing bases
 		outputBase(length, 0, codeArray, srcCodeArray);
-
+		
 		printWriter.close();
 		fileWriter.close();
 		
-		endTime = System.currentTimeMillis();
-		JOptionPane.showMessageDialog(frame, "Processing Complete. Total time: " + (float)((endTime - startTime)/1000.0)+ " seconds", "Complete", JOptionPane.INFORMATION_MESSAGE);
+		//endTime = System.currentTimeMillis();
+		//JOptionPane.showMessageDialog(frame, "Processing Complete. Total time: " + (float)((endTime - startTime)/1000.0)+ " seconds", "Complete", JOptionPane.INFORMATION_MESSAGE);
 
-		Desktop.getDesktop().open(new File(motifOutput));
+		//Desktop.getDesktop().open(new File(motifOutput));
+		
+		return outputString;
 	}
 
 	public static void outputBase(int length, int currentIndex, char[] codeArray, char[] srcCodeArray) {
@@ -84,6 +83,7 @@ public class motifCreator {
 			if(currentIndex == length - 1) {
 				//We are farthest to the right, stop recursing 
 				printWriter.print(new String(codeArray) + "\r\n");
+				outputString = (outputString + new String(codeArray) + "\r\n");
 				codeArray[currentIndex] = nextBase(srcCodeArray[currentIndex], codeArray[currentIndex]);
 			}
 			else {
@@ -102,9 +102,8 @@ public class motifCreator {
 		Component frame = null;
 		
 		//Check if string is empty
-		if(input.length() == 0) {
+		if(input.length() == 0) 
 			return false;
-		}
 		
 		//Check every input character is acceptable
 		for(int i = 0; i < input.length(); i++) {
@@ -115,7 +114,6 @@ public class motifCreator {
 		}
 		return true;
 	}
-	
 	
 	public static int maxBaseSize(char base) {
 		//Take the current code and return the number of different bases it could have

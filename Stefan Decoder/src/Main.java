@@ -1,19 +1,22 @@
-import java.io.IOException;
-
 /* The Stefan Decoder.
  * Made by Rob.
  * Made for Stefan.
  */
+
+import java.io.IOException;
+
 public class Main {
 	
 	public static void main(String[] args) throws IOException{
 		//Initialize Variables
-		String motifOutput = "motif output.txt";
+		String motifOutput = "";
 		
-		//Open Motif Creator window to get code input and process possible motifs.
-		motifCreator.motifWindow(motifOutput);	
+		//Create and launch main window
+		MainWindow testWindow = new MainWindow();
 		
-		System.exit(0);
+		testWindow.cbExport.setSelected(false);
+		
+		//System.exit(0);
 		
 	}
 }
