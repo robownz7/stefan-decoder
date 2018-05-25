@@ -17,7 +17,6 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import javafx.geometry.Insets;
 
 public class MainWindow implements ActionListener {
 
