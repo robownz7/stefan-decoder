@@ -3,18 +3,17 @@
  * Made for Stefan.
  */
 
-import java.io.IOException;
-
 public class Main {
 	
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args){
 		//Initialize Variables
-		String motifOutput = "";
+		//String motifOutput = "";
 		
 		//Create and launch main window
-		MainWindow testWindow = new MainWindow();
+		new MainWindow();
 		
-		testWindow.cbExport.setSelected(false);
+		//Open Motif Creator window to get code input and process possible motifs.
+		//motifCreator.motifWindow(motifOutput);	
 		
 		//System.exit(0);
 		

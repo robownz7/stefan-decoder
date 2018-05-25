@@ -1,7 +1,7 @@
 //Take an input code string, and output all possible motifs.
 import java.awt.Component;
-import java.awt.Desktop;
-import java.io.File;
+//import java.awt.Desktop;
+//import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,15 +14,13 @@ public class motifCreator {
     static PrintWriter printWriter;
     static String outputString;
     
-	public static String motifWindow(String input) throws IOException {
+	public static String createMotif(String input) throws IOException {
 		//initialize variables
 		int length;
 	    String motifOutput = "motif output.txt";
 	    fileWriter = new FileWriter(motifOutput);
 	    printWriter = new PrintWriter(fileWriter);
 	    outputString = "";
-	    //long startTime, endTime;
-	    //Component frame = null;
 	    
 		//store input length
 		length = input.length();
@@ -32,12 +30,9 @@ public class motifCreator {
 	    
 		//Check character validity
 		if(!checkCharacterValidity(input)) {
-			return "";
+			return null;
 		}
-		
-	    //Start process timer
-		//startTime = System.currentTimeMillis();
-	    
+		   
 		//Build Arrays
 		char[] srcCodeArray = new char[length];
 		char[] codeArray = new char[length];
@@ -64,9 +59,6 @@ public class motifCreator {
 		printWriter.close();
 		fileWriter.close();
 		
-		//endTime = System.currentTimeMillis();
-		//JOptionPane.showMessageDialog(frame, "Processing Complete. Total time: " + (float)((endTime - startTime)/1000.0)+ " seconds", "Complete", JOptionPane.INFORMATION_MESSAGE);
-
 		//Desktop.getDesktop().open(new File(motifOutput));
 		
 		return outputString;
