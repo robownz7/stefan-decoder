@@ -8,10 +8,16 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
@@ -24,7 +30,8 @@ public class MainWindow implements ActionListener {
 	public JTextField tfCode;
 	public JTextArea taFasta;
 	public JTextArea taMotifOutput;
-	private  JButton btMotif, btClearHighlights;
+	private JButton btMotif, btClearHighlights;
+	private JLabel lbCount;
 	
 	public MainWindow() {
 		//Initialize frame
@@ -37,6 +44,7 @@ public class MainWindow implements ActionListener {
 		GridBagConstraints gbcMainPanel = new GridBagConstraints();
 		pnMainPanel.setLayout( gbMainPanel );
 
+		//Create GUI components
 		btMotif = new JButton( "Build Motifs"  );
 		gbcMainPanel.gridx = 9;
 		gbcMainPanel.gridy = 0;
@@ -50,7 +58,6 @@ public class MainWindow implements ActionListener {
 		pnMainPanel.add( btMotif );
 
 		cbCompare = new JCheckBox( "Compare Motifs against FASTA string"  );
-		cbCompare.setSelected( false );
 		gbcMainPanel.gridx = 0;
 		gbcMainPanel.gridy = 1;
 		gbcMainPanel.gridwidth = 1;
@@ -63,6 +70,7 @@ public class MainWindow implements ActionListener {
 		pnMainPanel.add( cbCompare );
 
 		tfCode = new JTextField( );
+		tfCode.setToolTipText( "Enter a nucleotide code here." );
 		gbcMainPanel.gridx = 0;
 		gbcMainPanel.gridy = 0;
 		gbcMainPanel.gridwidth = 9;
@@ -75,6 +83,7 @@ public class MainWindow implements ActionListener {
 		pnMainPanel.add( tfCode );
 
 		taFasta = new JTextArea(2,10);
+		taFasta.setToolTipText( "Enter a FASTA string here." );
 		JScrollPane scpFasta = new JScrollPane( taFasta );
 		gbcMainPanel.gridx = 0;
 		gbcMainPanel.gridy = 3;
@@ -100,7 +109,8 @@ public class MainWindow implements ActionListener {
 		pnMainPanel.add( btClearHighlights );
 
 		cbExport = new JCheckBox( "Export to txt"  );
-		cbExport.setSelected( true );
+		cbExport.setSelected( false );
+		cbExport.setEnabled(false);
 		gbcMainPanel.gridx = 1;
 		gbcMainPanel.gridy = 1;
 		gbcMainPanel.gridwidth = 8;
@@ -112,7 +122,7 @@ public class MainWindow implements ActionListener {
 		gbMainPanel.setConstraints( cbExport, gbcMainPanel );
 		pnMainPanel.add( cbExport );
 
-		taMotifOutput = new JTextArea(2,10);
+		taMotifOutput = new JTextArea(2,10);		
 		JScrollPane scpMotifOutput = new JScrollPane( taMotifOutput );
 		gbcMainPanel.gridx = 9;
 		gbcMainPanel.gridy = 1;
@@ -125,20 +135,56 @@ public class MainWindow implements ActionListener {
 		gbMainPanel.setConstraints( scpMotifOutput, gbcMainPanel );
 		pnMainPanel.add( scpMotifOutput );
 
+		lbCount = new JLabel( "0 : 0   "  );
+		lbCount.setHorizontalAlignment(SwingConstants.RIGHT);
+		gbcMainPanel.gridx = 10;
+		gbcMainPanel.gridy = 19;
+		gbcMainPanel.gridwidth = 10;
+		gbcMainPanel.gridheight = 1;
+		gbcMainPanel.fill = GridBagConstraints.BOTH;
+		gbcMainPanel.weightx = 1;
+		gbcMainPanel.weighty = 0;
+		gbcMainPanel.anchor = GridBagConstraints.NORTH;
+		gbMainPanel.setConstraints( lbCount, gbcMainPanel );
+		pnMainPanel.add( lbCount );
+
 		//Add action listeners
 		btMotif.addActionListener(this);
 		btClearHighlights.addActionListener(this);
 		cbCompare.addActionListener(this);
 		
+		//taFASTA Docuemnt and Caret listener for character count and position updates.
+		taFasta.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {		
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				lbCount.setText(taFasta.getCaretPosition() + " : " + taFasta.getText().length() + "   ");
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {				
+			}		
+		});
+		
+		taFasta.addCaretListener(new CaretListener() {
+			@Override
+			public void caretUpdate(CaretEvent arg0) {
+				lbCount.setText(taFasta.getCaretPosition() + " : " + taFasta.getText().length() + "   ");
+			}			
+		});
 		
 		//Add window elements to the main frame.
 		mainFrame.add(pnMainPanel);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setSize(600,450);
+		mainFrame.setSize(800,600);
 		mainFrame.setMinimumSize(new Dimension(500,150));
 		mainFrame.setLocationRelativeTo(null);
-		mainFrame.setVisible(true);
-		
+		mainFrame.setVisible(true);		
+		mainFrame.getRootPane().setDefaultButton(btMotif);
 		
 	}
 
@@ -202,12 +248,17 @@ public class MainWindow implements ActionListener {
 	
 	public void runHighlighter(String motifText) throws BadLocationException {
 		
+		
 		//Split up all motifs
 		String strToken[] = motifText.split("[\\r\\n]+");
 		int numMotifs = strToken.length;
 		int index;
 		int length = strToken[0].length();
 		
+		//Remove line breaks from Fasta.
+		taFasta.setText(taFasta.getText().replaceAll("[\\r\\n]+", ""));
+		taFasta.setLineWrap(true);
+				
 		//Create the highlighters
 		Highlighter highlighter = taFasta.getHighlighter();
 		HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW);
@@ -221,6 +272,5 @@ public class MainWindow implements ActionListener {
 				index = taFasta.getText().indexOf(strToken[i], index+length);
 			}			
 		}
-
 	}
 }
